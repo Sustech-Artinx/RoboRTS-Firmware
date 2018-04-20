@@ -177,14 +177,14 @@ int shot_cmd;
 static void shoot_bullet_handle(void)
 {
 	// Added by H.F. For debug
-	trig.key = 0;
+	//trig.key = 0;
 
   shot_cmd = shot.shoot_cmd;
   if (shot.shoot_cmd)
   {
     if (trig.one_sta == TRIG_INIT)
     {
-      if (trig.key == 0)
+      if (trig.key == 1)
       {
         trig.one_sta = TRIG_PRESS_DOWN;
         trig.one_time = HAL_GetTick();
@@ -192,7 +192,7 @@ static void shoot_bullet_handle(void)
     }
     else if (trig.one_sta == TRIG_PRESS_DOWN)
     {
-      if (HAL_GetTick() - trig.one_time >= 1000) //2000) //before the rising
+      if (HAL_GetTick() - trig.one_time >= 2000) //before the rising
       {
         trig.one_sta = TRIG_ONE_DONE;
       }
@@ -205,7 +205,7 @@ static void shoot_bullet_handle(void)
     }
     else if (trig.one_sta == TRIG_BOUNCE_UP)
     {
-      if (HAL_GetTick() - trig.one_time >= 1000) //2000)
+      if (HAL_GetTick() - trig.one_time >= 2000)
       {
         trig.one_sta = TRIG_ONE_DONE;
       }

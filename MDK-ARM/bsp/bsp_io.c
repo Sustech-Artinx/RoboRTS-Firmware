@@ -41,7 +41,7 @@ void turn_off_laser(void)
 uint8_t get_trigger_key_state(void)
 {
 	
-  return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin); //changed by H.F. 20180405
+  return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
 }
 
 

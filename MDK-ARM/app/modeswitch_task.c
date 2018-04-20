@@ -271,7 +271,8 @@ static void gimbal_mode_handle(void)
         
         default:
         {
-          gim.ctrl_mode = GIMBAL_RELAX;
+          gim.ctrl_mode = GIMBAL_RELAX;			
+
         }break;
       }
     }break;
@@ -285,7 +286,10 @@ static void gimbal_mode_handle(void)
 		
 		default:
     {
-      gim.ctrl_mode = GIMBAL_RELAX;
+
+     gim.ctrl_mode = GIMBAL_RELAX;
+		//gim.ctrl_mode = GIMBAL_POSITION_MODE; // changed for hold gimbal by H.F. 20180420
+
     }break;
   }
 }
