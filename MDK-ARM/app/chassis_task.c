@@ -210,6 +210,8 @@ void separate_gimbal_handle(void)
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
 	chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R - km.vw * CHASSIS_KB_MOVE_RATIO_R; 
+	//chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
+
 }	
 void follow_gimbal_handle(void)
 {

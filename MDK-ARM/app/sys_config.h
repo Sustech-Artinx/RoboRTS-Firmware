@@ -22,7 +22,7 @@
 
 /**********************remote control setting***************************/
 /* normalized remote controller proportion */
-#define RC_RESOLUTION     660.0f
+#define RC_RESOLUTION     500.0f //660.0f
 
 /*************************chassis setting*******************************/
 /* remote mode chassis move speed limit */
@@ -64,7 +64,8 @@
 /* shot speed */
 #define DEFAULT_FRIC_WHEEL_SPEED 1500 //maximum value is 2500
 /* shot frequence */
-#define TRIGGER_MOTOR_SPEED      2000 
+#define TRIGGER_MOTOR_SPEED      1600  //2000 
+#define TRIGGER_MOTOR_SPEED_SINGLE      2500 
 
 
 

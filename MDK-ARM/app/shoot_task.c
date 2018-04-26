@@ -177,22 +177,23 @@ int shot_cmd;
 static void shoot_bullet_handle(void)
 {
 	// Added by H.F. For debug
-	//trig.key = 0;
+	trig.key = 0;
 
   shot_cmd = shot.shoot_cmd;
   if (shot.shoot_cmd)
   {
-    if (trig.one_sta == TRIG_INIT)
+    /*if (trig.one_sta == TRIG_INIT)
     {
       if (trig.key == 1)
       {
-        trig.one_sta = TRIG_PRESS_DOWN;
+       //trig.one_sta = TRIG_PRESS_DOWN;
+				trig.one_sta = TRIG_ONE_DONE;
         trig.one_time = HAL_GetTick();
       }
     }
     else if (trig.one_sta == TRIG_PRESS_DOWN)
     {
-      if (HAL_GetTick() - trig.one_time >= 2000) //before the rising
+      if (HAL_GetTick() - trig.one_time >= 1000) //before the rising
       {
         trig.one_sta = TRIG_ONE_DONE;
       }
@@ -205,7 +206,7 @@ static void shoot_bullet_handle(void)
     }
     else if (trig.one_sta == TRIG_BOUNCE_UP)
     {
-      if (HAL_GetTick() - trig.one_time >= 2000)
+      if (HAL_GetTick() - trig.one_time >= 1000)
       {
         trig.one_sta = TRIG_ONE_DONE;
       }
@@ -229,7 +230,23 @@ static void shoot_bullet_handle(void)
     }
     else
       trig.spd_ref = trig.feed_bullet_spd;
-    
+    */
+		if (trig.one_sta == TRIG_INIT)
+		{	
+      trig.one_time = HAL_GetTick();
+		  trig.one_sta = TRIG_ONE_DONE;
+
+		}
+			
+		if (HAL_GetTick() - trig.one_time >= 150){
+			trig.spd_ref = 0;
+      trig.one_sta = TRIG_INIT;
+      shot.shoot_cmd = 0;
+		}
+		else
+	    trig.spd_ref = trig.feed_bullet_spd;
+
+				
   }
   else if (shot.c_shoot_cmd)
   {
@@ -243,10 +260,13 @@ static void shoot_bullet_handle(void)
   }
   else
   {
-    if (trig.key)       //not trigger
+   /* if (trig.key)       //not trigger
       trig.spd_ref = trig.feed_bullet_spd;
     else
       trig.spd_ref = 0;
+		*/
+      trig.spd_ref = 0;
+		
   }
   
   pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref*trig.dir);
@@ -263,7 +283,7 @@ void shot_param_init(void)
   memset(&trig, 0, sizeof(trigger_t));
   
   trig.dir             = TRI_MOTO_POSITIVE_DIR;
-  trig.feed_bullet_spd = TRIGGER_MOTOR_SPEED; //2000; //changed by H.F.
+  trig.feed_bullet_spd = TRIGGER_MOTOR_SPEED_SINGLE; //2000; //changed by H.F.
   trig.c_shot_spd      = TRIGGER_MOTOR_SPEED; // chagned by H.F.
   trig.one_sta         = TRIG_INIT;
   

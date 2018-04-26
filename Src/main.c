@@ -149,7 +149,7 @@ int main(void)
   pwm_device_init();
   mpu_device_init();
   can_device_init();
-  //gyro_device_init(); //commited by H.F. 03/04
+  gyro_device_init(); //commited by H.F. 03/04
   
   //open can receive it
   can_receive_start();
