@@ -64,32 +64,27 @@ typedef __packed struct
 
 typedef __packed struct
 {
-  /* trigger motor param */
+  /* bullet supply motor param */
   int32_t   spd_ref;
   int32_t   pos_ref;
-  int8_t    dir;
-  uint8_t   key;
-  uint8_t   key_last;
-  uint32_t  one_time;
   int32_t   feed_bullet_spd;
-  int32_t   c_shot_spd;
   
-  trig_state_e one_sta;
-} trigger_t;
+  uint8_t bbkey_state; //state of bullet block key
+  uint8_t bbkey_state_last;
+} bullet_supply_t;
 
-typedef enum
-{
-  SHOOT_CMD,
-  FRIC_CTRL,
-} shoot_type_e;
+#define BBKEY_ON 1  //bullet is on the bullet block key
+#define BBKEY_OFF 0
 
 void shot_param_init(void);
 void shot_task(void const *argu);
+void switch_shoot_mode(shoot_mode_e mode);
 
-static void shoot_bullet_handle(void);
+static uint8_t shoot_bullet_handle(void);
 static void fric_wheel_ctrl(void);
+static uint8_t stuck_detect(void);
+static uint8_t stuck_handle(void);
 
 extern shoot_t   shot;
-extern trigger_t trig;
 
 #endif

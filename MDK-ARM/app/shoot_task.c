@@ -155,6 +155,8 @@ void block_bullet_handle(void)
     }
     else
       trig.spd_ref = 2000;
+  } else {
+    return 1;
   }
 }
 
@@ -204,6 +206,7 @@ static void shoot_bullet_handle(void)
         trig.one_time = HAL_GetTick();
       }
     }
+<<<<<<< HEAD
     else if (trig.one_sta == TRIG_BOUNCE_UP)
     {
       if (HAL_GetTick() - trig.one_time >= 1000)
@@ -270,6 +273,8 @@ static void shoot_bullet_handle(void)
   }
   
   pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref*trig.dir);
+=======
+>>>>>>> dev-bin
 }
 
 void shot_param_init(void)
@@ -280,12 +285,14 @@ void shot_param_init(void)
   shot.fric_wheel_spd = 2500;
   //shot.remain_bullets = 0;
   
+<<<<<<< HEAD
   memset(&trig, 0, sizeof(trigger_t));
   
   trig.dir             = TRI_MOTO_POSITIVE_DIR;
   trig.feed_bullet_spd = TRIGGER_MOTOR_SPEED_SINGLE; //2000; //changed by H.F.
   trig.c_shot_spd      = TRIGGER_MOTOR_SPEED; // chagned by H.F.
   trig.one_sta         = TRIG_INIT;
+>>>>>>> dev-bin
   
 }
 

@@ -64,8 +64,11 @@
 /* shot speed */
 #define DEFAULT_FRIC_WHEEL_SPEED 1500 //maximum value is 2500
 /* shot frequence */
+<<<<<<< HEAD
 #define TRIGGER_MOTOR_SPEED      1600  //2000 
 #define TRIGGER_MOTOR_SPEED_SINGLE      2500 
+=======
+>>>>>>> dev-bin
 
 
 
