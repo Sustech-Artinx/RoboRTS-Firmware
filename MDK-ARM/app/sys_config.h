@@ -68,6 +68,7 @@
 #define TRIGGER_MOTOR_SPEED      1600  //2000 
 #define TRIGGER_MOTOR_SPEED_SINGLE      2500 
 =======
+#define TRIGGER_MOTOR_SPEED      8000 
 >>>>>>> dev-bin
 
 
@@ -130,6 +131,11 @@
 /* the positive direction of tirgger motor */
 #define TRI_MOTO_POSITIVE_DIR  -1.0f
 
+#ifdef SENTRY
+
+#define TRI_MOTO_POSITIVE_DIR  1.0f
+
+#endif
 
 
 

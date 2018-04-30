@@ -39,7 +39,20 @@ typedef enum
   KEYBOARD_CTRL_SHOT = 2,
   SEMIAUTO_CTRL_SHOT = 3,
   AUTO_CTRL_SHOT     = 4,
+} shoot_ctrl_mode_e;
+
+typedef enum{
+  SEMI_ONE    = 1,
+  SEMI_THREE  = 2,
+  AUTO        = 3,
 } shoot_mode_e;
+
+typedef enum{
+  WAITING_CMD     = 0,
+  SHOOTING        = 1,
+  RELOADING       = 2,
+  STUCK_HANDLING  = 3,
+} shoot_state_e;
 
 typedef enum
 {
@@ -49,17 +62,25 @@ typedef enum
   TRIG_ONE_DONE   = 3,
 } trig_state_e;
 
+
+
 typedef __packed struct
 {
   /* shoot task relevant param */
-  shoot_mode_e ctrl_mode;
-  uint8_t      shoot_cmd;
-  uint32_t     c_shoot_time;   //continuous
-  uint8_t      c_shoot_cmd;
+  //public
+  shoot_ctrl_mode_e ctrl_mode;
+  shoot_mode_e shoot_mode;
+  uint8_t      shoot_cmd;	//1 for shot, 2 for reload
   uint8_t      fric_wheel_run; //run or not
-  uint16_t     fric_wheel_spd;
   uint16_t     shot_bullets;
   uint16_t     remain_bullets;
+  //private
+  shoot_state_e shoot_state;
+  uint8_t      shoot_spd; //shoot speed(frequence)
+  uint8_t      shoot_num; //number of bullet to be shooted each cmd
+	uint8_t      shooted_count; //number of bullet have shooted each cmd
+  uint16_t     fric_wheel_spd;
+  uint32_t     timestamp; //store last key action time
 } shoot_t;
 
 typedef __packed struct

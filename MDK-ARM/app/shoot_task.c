@@ -40,15 +40,19 @@
 #include "cmsis_os.h"
 #include "string.h"
 
+/* setting */
+#define RELOAD_TIMEOUT 2500
+#define ABS(num) ((num)>0?(num):-(num))
+
 /* stack usage monitor */
 UBaseType_t shoot_stack_surplus;
 
 /* shot task global parameter */
 shoot_t   shot;
-trigger_t trig;
+bullet_supply_t bupply;
+client_show_data_t client_show_data;
+//client_show_data.data1 = 100;
 
-uint32_t shoot_time_last;
-int shoot_time_ms;
 void shot_task(void const *argu)
 {
   osEvent event;
@@ -60,61 +64,68 @@ void shot_task(void const *argu)
     if (event.status == osEventSignal)
     {
       if (event.value.signals & SHOT_TASK_EXE_SIGNAL)
-      {
-        shoot_time_ms = HAL_GetTick() - shoot_time_last;
-        shoot_time_last = HAL_GetTick();
-        
+      {	
+				//data_packet_pack(STU_CUSTOM_DATA_ID, (uint8_t *)&pc_rece_mesg.show_in_client_data,
+          //           sizeof(client_show_data_t), 0xA5);
         fric_wheel_ctrl();
+        bupply.bbkey_state = get_bbkey_state();
         
-        if (!shot.fric_wheel_run)
-        {
-          shot.shoot_cmd   = 0;
-          shot.c_shoot_cmd = 0;
-        }
-        
-#ifdef OLD_TRIGGER  
-        /*
-        if (shot.fric_wheel_run)
-        {
-          if (glb_sw.last_sw1 == RC_DN)
-            trig.pos_ref = moto_trigger.total_ecd;
-          if (shot.shoot_cmd)
-          {
-            trig.pos_ref = moto_trigger.total_ecd;
-            trig.pos_ref += 130922 * trig.dir;
+        if(shot.shoot_state == WAITING_CMD){
+          if(shot.shoot_cmd == 1){
+            /* ignore shoot command when friction wheel is disable */
+            if (shot.fric_wheel_run){
+              bupply.spd_ref = bupply.feed_bullet_spd;
+              shot.shooted_count = 0;
+              shot.timestamp = HAL_GetTick();
+              shot.shoot_state = SHOOTING;
+              if(shot.shoot_mode != AUTO){
+                //in AUTO, cmd reset by remote control
+                shot.shoot_cmd = 0;
+              }
+            } else{
+              shot.shoot_cmd = 0;
+            }
+        } else if(shot.shoot_cmd == 2){
+            bupply.spd_ref = bupply.feed_bullet_spd;
+            shot.timestamp = HAL_GetTick();
+            shot.shoot_state = RELOADING;
             shot.shoot_cmd = 0;
           }
-        
-          pid_calc(&pid_trigger, moto_trigger.total_ecd / 100, trig.pos_ref / 100);
-          
-          if (shot.c_shoot_cmd)
-            trig.spd_ref = -4000;
-          else
-            trig.spd_ref = pid_trigger.out;
-          
-          block_bullet_handle();
-          pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref);
+        } else if(shot.shoot_state == SHOOTING){
+          if(shoot_bullet_handle()){
+            ;
+          } else {
+            //no need to update timestamp 
+            //because shoot_bullet_handle() has made it
+            bupply.spd_ref = bupply.feed_bullet_spd;
+            shot.shoot_state = RELOADING;
+          }
+        } else if(shot.shoot_state == RELOADING){
+          if(bupply.bbkey_state == BBKEY_ON){
+            //reload complete
+            bupply.spd_ref = 0;
+            shot.shoot_state = WAITING_CMD;
+          } else if(HAL_GetTick()-shot.timestamp > RELOAD_TIMEOUT){
+            //timeout
+            bupply.spd_ref = 0;
+            shot.shoot_state = WAITING_CMD;
+          }
+        } else if(shot.shoot_state == STUCK_HANDLING){
+          if(stuck_handle()){
+            ;
+          } else {
+            bupply.spd_ref = bupply.feed_bullet_spd;
+            shot.timestamp = HAL_GetTick();
+            shot.shoot_state = RELOADING;
+          }
         }
-        else
-        {
-          pid_trigger_speed.out = 0;
+        if(stuck_detect()){
+          bupply.spd_ref = -bupply.spd_ref;
+          shot.timestamp = HAL_GetTick();
+          shot.shoot_state = STUCK_HANDLING;
         }
-        */
-#else
-        
-        trig.key = get_trigger_key_state();
-        
-        if (shot.fric_wheel_run)
-        {
-          shoot_bullet_handle();
-        }
-        else
-        {
-          pid_trigger_speed.out = 0;
-        }
-        
-        trig.key_last = trig.key;
-#endif
+        pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, bupply.spd_ref);
+        bupply.bbkey_state_last = bupply.bbkey_state;
       }
     }
     
@@ -122,39 +133,44 @@ void shot_task(void const *argu)
   }
 }
 
-
-
-void block_bullet_handle(void)
-{
-  uint32_t stall_count = 0;
-  uint32_t stall_inv_count = 0;
-  uint8_t  stall_f = 0;
-  
-  if (pid_trigger_speed.out <= -4000)
-  {
-    if (stall_f == 0)
-      stall_count ++;
+void switch_shoot_mode(shoot_mode_e mode){
+  shot.shoot_mode = mode;
+  switch(shot.shoot_mode){
+    case SEMI_ONE:
+      shot.shoot_spd = 15;
+      shot.shoot_num = 1;
+      shot.fric_wheel_spd = 2500;
+      break;
+    case SEMI_THREE:
+      shot.shoot_spd = 15;
+      shot.shoot_num = 3;
+      shot.fric_wheel_spd = 2500;
+      break;
+    case AUTO:
+      shot.shoot_spd = 15;
+      shot.shoot_num = 0;
+      shot.fric_wheel_spd = 1000;
+      break;
   }
-  else
-    stall_count = 0;
-  
-  if (stall_count >= 50)         //0.25s
-  {
-    stall_f = 1;
-    stall_count = 0;
-  }
-  
-  if (stall_f == 1)
-  {
-    stall_inv_count++;
-    
-    if (stall_inv_count >= 100)  //0.5s
-    {
-      stall_f = 0;
-      stall_inv_count = 0;
+}
+
+static uint8_t stuck_detect(void){
+  static uint32_t last_uptime;
+  if(ABS(moto_trigger.speed_rpm) < ABS(bupply.spd_ref)/3){
+    if(HAL_GetTick()-last_uptime > 500){
+      //stuck confirm
+      return 1;
     }
-    else
-      trig.spd_ref = 2000;
+  } else {
+    last_uptime = HAL_GetTick();
+  }
+  return 0;
+}
+
+static uint8_t stuck_handle(void)
+{
+  if(HAL_GetTick()-shot.timestamp > 200000/ABS(bupply.spd_ref)){
+    return 0;
   } else {
     return 1;
   }
@@ -174,10 +190,9 @@ static void fric_wheel_ctrl(void)
   }
 }
 
-int debug_tri_speed = 2000;
-int shot_cmd;
-static void shoot_bullet_handle(void)
+static uint8_t shoot_bullet_handle(void)
 {
+<<<<<<< HEAD
 	// Added by H.F. For debug
 	trig.key = 0;
 
@@ -198,12 +213,29 @@ static void shoot_bullet_handle(void)
       if (HAL_GetTick() - trig.one_time >= 1000) //before the rising
       {
         trig.one_sta = TRIG_ONE_DONE;
+=======
+  static uint8_t holding = 0;
+  uint32_t time_now = HAL_GetTick();
+  if(time_now-shot.timestamp > RELOAD_TIMEOUT){
+    holding = 0;  //reset state
+    return 0;
+  } else if(shot.shooted_count == shot.shoot_num || shot.shoot_cmd){
+    holding = 0;  //reset state
+    return 0;
+  } else {
+    if(holding){
+      if(time_now-shot.timestamp >= 1000/shot.shoot_spd){
+        holding = 0;  //shoot
+        bupply.spd_ref = bupply.feed_bullet_spd;
+>>>>>>> dev-bin
       }
-
-      if ((trig.key_last == 0) && (trig.key))    //Rising edge trigger button bounce
-      {
-        trig.one_sta = TRIG_BOUNCE_UP;
-        trig.one_time = HAL_GetTick();
+    } else {
+      if(bupply.bbkey_state_last == BBKEY_ON && bupply.bbkey_state == BBKEY_OFF){
+        shot.shooted_count++;
+        shot.timestamp = HAL_GetTick();
+      } else if(bupply.bbkey_state_last == BBKEY_OFF && bupply.bbkey_state == BBKEY_ON){
+        holding = 1;  //waiting next shoot
+        bupply.spd_ref = 0;
       }
     }
 <<<<<<< HEAD
@@ -274,6 +306,8 @@ static void shoot_bullet_handle(void)
   
   pid_calc(&pid_trigger_speed, moto_trigger.speed_rpm, trig.spd_ref*trig.dir);
 =======
+    return 1;
+  }
 >>>>>>> dev-bin
 }
 
@@ -282,7 +316,8 @@ void shot_param_init(void)
   memset(&shot, 0, sizeof(shoot_t));
   
   shot.ctrl_mode      = SHOT_DISABLE;
-  shot.fric_wheel_spd = 2500;
+  shot.shoot_state    = WAITING_CMD;
+  switch_shoot_mode(SEMI_ONE);
   //shot.remain_bullets = 0;
   
 <<<<<<< HEAD
@@ -292,7 +327,10 @@ void shot_param_init(void)
   trig.feed_bullet_spd = TRIGGER_MOTOR_SPEED_SINGLE; //2000; //changed by H.F.
   trig.c_shot_spd      = TRIGGER_MOTOR_SPEED; // chagned by H.F.
   trig.one_sta         = TRIG_INIT;
+=======
+  memset(&bupply, 0, sizeof(bullet_supply_t));
 >>>>>>> dev-bin
   
+  bupply.feed_bullet_spd = TRI_MOTO_POSITIVE_DIR*TRIGGER_MOTOR_SPEED; //2000; //changed by H.F.
 }
 
