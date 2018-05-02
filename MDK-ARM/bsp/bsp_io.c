@@ -60,6 +60,8 @@ uint8_t get_bbkey_state(void)
   return last_state; //changed by Mr.bin 20180421
 >>>>>>> dev-bin
 =======
+  //changed by Mr.bin 20180430
+  return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
 >>>>>>> origin/dev-bin
 }
 
