@@ -172,6 +172,7 @@ static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
 	}
 	if (mode == 3){
 		shot.shoot_cmd = rc.mouse.l; //only fire when press donw the left key
+		// open the big fric
 	}else{
 		if(shoot == 1){
 			shot.shoot_cmd = shoot;

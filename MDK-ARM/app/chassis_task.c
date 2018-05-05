@@ -47,7 +47,7 @@
 /* twist period time (ms) */
 #define TWIST_PERIOD   1500
 /* warning surplus energy */
-#define WARNING_ENERGY 40.0f
+#define WARNING_ENERGY 50.0f //40.0f
 
 UBaseType_t chassis_stack_surplus;
 
@@ -136,21 +136,18 @@ void chassis_task(void const *argu)
     chassis.current[i] = pid_calc(&pid_spd[i], chassis.wheel_speed_fdb[i], chassis.wheel_speed_ref[i]);
   }*/
 	
-	power_limit_handle(); // added by HF for powerlimit from judement system
-	
 	chassis.current[0] = pid_calc(&pid_spd[0], chassis.wheel_speed_fdb[0], chassis.wheel_speed_ref[0]);
 	chassis.current[1] = pid_calc(&pid_spd[1], chassis.wheel_speed_fdb[1], chassis.wheel_speed_ref[1]);
 	chassis.current[2] = pid_calc(&pid_spd[2], chassis.wheel_speed_fdb[2], chassis.wheel_speed_ref[2]);
 	chassis.current[3] = pid_calc(&pid_spd[3], chassis.wheel_speed_fdb[3], chassis.wheel_speed_ref[3]);
-	
-	
   
   if (!chassis_is_controllable())
   {
     memset(chassis.current, 0, sizeof(chassis.current));
   }
 	
-
+	power_limit_handle();
+  
   memcpy(glb_cur.chassis_cur, chassis.current, sizeof(chassis.current));
   osSignalSet(can_msg_send_task_t, CHASSIS_MOTOR_MSG_SEND);
   
@@ -209,9 +206,7 @@ void separate_gimbal_handle(void)
 {
   chassis.vy = rm.vy * CHASSIS_RC_MOVE_RATIO_Y + km.vy * CHASSIS_KB_MOVE_RATIO_Y;
   chassis.vx = rm.vx * CHASSIS_RC_MOVE_RATIO_X + km.vx * CHASSIS_KB_MOVE_RATIO_X;
-	chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R - km.vw * CHASSIS_KB_MOVE_RATIO_R; 
-	//chassis.vw = pid_calc(&pid_chassis_angle, gim.sensor.yaw_relative_angle, chassis.position_ref);
-
+	chassis.vw = rm.vw * CHASSIS_RC_MOVE_RATIO_R + km.vw * CHASSIS_KB_MOVE_RATIO_R; 
 }	
 void follow_gimbal_handle(void)
 {
@@ -346,42 +341,27 @@ void chassis_param_init(void)
   memset(&pc_rece_mesg.structure_data, 0, sizeof(pc_rece_mesg.structure_data));
 }
 
-//#if 0 //changed by H.F.
-#if 1
-
-float total_cur_limit;
+int32_t total_cur_limit;
 int32_t total_cur;
 void power_limit_handle(void)
 {
   if (g_err.list[JUDGE_SYS_OFFLINE].err_exist)
   {
     //judge system offline, mandatory limit current
-    total_cur_limit = 8000;
+    total_cur_limit = 40000;
   }
   else 
   {
-    
-		/*if (judge_rece_mesg.game_information.remain_hp < WARNING_ENERGY)
-      total_cur_limit = ((judge_rece_mesg.game_information.remain_hp * \
-                          judge_rece_mesg.game_information.remain_hp)/ \
-                          (WARNING_ENERGY*WARNING_ENERGY)) * 40000;
+    if (judge_rece_mesg.power_heat_data.chassis_pwr_buf < WARNING_ENERGY)
+      total_cur_limit = (judge_rece_mesg.power_heat_data.chassis_pwr_buf/60) * 40000;
     else
-      //total_cur_limit = 40000; // changed by H.F. 20180415
-		      total_cur_limit = 60.0f / judge_rece_mesg.power_heat_data.chassis_volt;
-		*/
-		 // commited by H.F. until next time
-   	
-		/*total_cur_limit = 60*1000 / \
-											judge_rece_mesg.power_heat_data.chassis_volt; */
-		total_cur_limit = 2500;
+      total_cur_limit = 40000;
   }
   
-	
   total_cur = abs(chassis.current[0]) + abs(chassis.current[1]) + \
               abs(chassis.current[2]) + abs(chassis.current[3]);
   
- if (total_cur > total_cur_limit)
-  //if (judge_rece_mesg.power_heat_data.chassis_power > 60)
+  if (total_cur > total_cur_limit)
   {
     chassis.current[0] = chassis.current[0] / total_cur * total_cur_limit;
     chassis.current[1] = chassis.current[1] / total_cur * total_cur_limit;
@@ -390,6 +370,5 @@ void power_limit_handle(void)
   }
 
 }
-#endif
 
 

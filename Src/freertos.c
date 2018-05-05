@@ -80,8 +80,6 @@ TaskHandle_t imu_task_t;
 TaskHandle_t freq_info_task_t;
 TaskHandle_t judge_unpack_task_t;
 TaskHandle_t pc_unpack_task_t;
-TaskHandle_t record_task_t;// added by H.F. 20180426
-
 
 osTimerId chassis_timer_id;
 osTimerId gimbal_timer_id;
@@ -197,9 +195,6 @@ void MX_FREERTOS_Init(void) {
     
     osThreadDef(pcunpackTask, pc_unpack_task, osPriorityNormal, 0, 512);
     pc_unpack_task_t = osThreadCreate(osThread(pcunpackTask), NULL);
-		
-		osThreadDef(rcdTask, record_task, osPriorityNormal, 0, 512);
-    record_task_t = osThreadCreate(osThread(rcdTask), NULL);
     
   taskEXIT_CRITICAL();
   /* USER CODE END RTOS_THREADS */
@@ -216,7 +211,7 @@ void StartDefaultTask(void const * argument)
   MX_FATFS_Init();
 
   /* USER CODE BEGIN StartDefaultTask */
-  //osThreadResume(record_task_t);// uncommit by H.F. 20180426
+  //osThreadResume(record_task_t);
   /* Infinite loop */
   for(;;)
   {

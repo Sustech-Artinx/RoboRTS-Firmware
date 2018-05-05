@@ -112,7 +112,6 @@ static void rc_shoot_cmd(uint8_t single_fir, uint8_t cont_fir)
   
 //  if (cont_fir && (HAL_GetTick() - shot.c_shoot_time >= 2000))
   if (cont_fir){
-
     shot.shoot_cmd   = 1;
 		switch_shoot_mode(AUTO); 
   }

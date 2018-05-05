@@ -136,7 +136,7 @@ void gimbal_task(void const *argu)
   }
 
   /* pitch axis limited angle */
-  VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
+  //VAL_LIMIT(gim.pid.pit_angle_ref, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
   
   //角度环做内环
   pid_calc(&pid_yaw, gim.pid.yaw_angle_fdb, gim.pid.yaw_angle_ref);
@@ -154,7 +154,7 @@ void gimbal_task(void const *argu)
   /* safe protect */
   if (gimbal_is_controllable())
   {
-    glb_cur.gimbal_cur[0] = -YAW_MOTO_POSITIVE_DIR*pid_yaw_speed.out;
+    glb_cur.gimbal_cur[0] = YAW_MOTO_POSITIVE_DIR*pid_yaw_speed.out;
 		//glb_cur.gimbal_cur[0] = -YAW_MOTO_POSITIVE_DIR*pid_yaw.out; //只做位置环
 
     glb_cur.gimbal_cur[1] = -PIT_MOTO_POSITIVE_DIR*pid_pit_speed.out; 
@@ -291,7 +291,7 @@ void pc_position_ctrl_handle(void)
   
   taskENTER_CRITICAL();
   gim.pid.pit_angle_ref = pc_rece_mesg.gimbal_control_data.pit_ref;
-  gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref; 
+  gim.pid.yaw_angle_ref = pc_rece_mesg.gimbal_control_data.yaw_ref; //commit by H.F. 2080401
   
 	//gim.pid.pit_angle_ref = 0;
   //gim.pid.yaw_angle_ref = 0;
