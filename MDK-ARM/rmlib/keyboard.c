@@ -165,19 +165,13 @@ static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
   shoot_mode_e mode  = shot.shoot_mode;
 	if (shoot_switch ){   //switch shoot mode
 		mode++;
-		if (mode>3){
-			mode = SEMI_ONE;
+		if (mode>4){
+			mode = G17_SEMI_ONE;
 		}
 		switch_shoot_mode(mode);
 	}
-	if (mode == 3){
-		shot.shoot_cmd = rc.mouse.l; //only fire when press donw the left key
-		// open the big fric
-	}else{
-		if(shoot == 1){
-			shot.shoot_cmd = shoot;
-		}
-	}
+	gun_17.cmd = rc.mouse.l;
+	gun_42.cmd = rc.mouse.l;
 }
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
                                   uint8_t shoot_buff,  uint8_t track_armor)

@@ -44,17 +44,38 @@ uint8_t get_bbkey_state(void)
   return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
 }
 
-
-void turn_on_friction_wheel(uint16_t spd)
+//17mm and 42mm bullet friction wheel
+void turn_on_friction_wheel_g17(uint16_t spd)
 {
-  LEFT_FRICTION  = spd;
-  RIGHT_FIRCTION = spd;
+  G17_LEFT_FRICTION  = spd;
+  G17_RIGHT_FIRCTION = spd;
 }
 
-void turn_off_friction_wheel(void)
+void turn_on_friction_wheel_g42(uint16_t spd)
 {
-  LEFT_FRICTION  = 1000;
-  RIGHT_FIRCTION = 1000;
+	G42_LEFT_FRICTION = spd;
+	G42_RIGHT_FRICTION = spd;
+}
+
+void turn_off_friction_wheel_g17(void)
+{
+  G17_LEFT_FRICTION  = 1000;
+  G17_RIGHT_FIRCTION = 1000;
+}
+
+void turn_off_friction_wheel_g42(void)
+{
+	G42_LEFT_FRICTION = 1000;
+	G42_RIGHT_FRICTION = 1000;
+}
+
+/* 42mm bullet supply pneumatic pusher */
+void g42_bupply_pusher_forward(void){
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_RESET);
+}
+
+void g42_bupply_pusher_back(void){
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_RESET);
 }
 
 void mpu_heat_ctrl(uint16_t pwm_pulse)

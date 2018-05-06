@@ -169,8 +169,10 @@
 #define YAW_ANGLE_MAX        50
 #define YAW_ANGLE_MIN        -50
 
-#define LEFT_FRICTION        TIM1->CCR1
-#define RIGHT_FIRCTION       TIM1->CCR4
+#define G17_LEFT_FRICTION    	    TIM1->CCR1
+#define G17_RIGHT_FIRCTION   	    TIM1->CCR4
+#define G42_LEFT_FRICTION  		    TIM1->CCR2
+#define G42_RIGHT_FRICTION		    TIM1->CCR3
 
 /* detect task relevant */
 #define BEEP_ERR

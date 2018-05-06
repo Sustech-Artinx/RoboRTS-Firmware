@@ -107,13 +107,13 @@ void get_shoot_info(void)
   {
     case REMOTE_CTRL_SHOT:
     {
-      shot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;//_SPEEDspeed_debug;
+      //gun_17.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;//_SPEEDspeed_debug; //mrbin 20180205
       remote_ctrl_shoot_hook();
     }break;
     
     case KEYBOARD_CTRL_SHOT:
     {
-      shot.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;//speed_debug;
+      //gun_17.fric_wheel_spd = DEFAULT_FRIC_WHEEL_SPEED;//speed_debug; //mrbin 20180205
       remote_ctrl_shoot_hook();
       keyboard_shoot_hook();
     }break;
@@ -122,22 +122,22 @@ void get_shoot_info(void)
     {
       //shot.fric_wheel_run = pc_rece_mesg.shoot_control_data.fric_wheel_run;
       //shot.fric_wheel_spd = pc_rece_mesg.shoot_control_data.fric_wheel_spd;
-      shot.shoot_cmd      = pc_rece_mesg.shoot_control_data.shoot_cmd;
+      //shot.shoot_cmd      = pc_rece_mesg.shoot_control_data.shoot_cmd;	//mrbin 20180205
       //shot.c_shoot_cmd    = pc_rece_mesg.shoot_control_data.c_shoot_cmd; // hf 20180448
     }break;
     
     case AUTO_CTRL_SHOT:
     {
       shot.fric_wheel_run = pc_rece_mesg.shoot_control_data.fric_wheel_run;
-      shot.fric_wheel_spd = pc_rece_mesg.shoot_control_data.fric_wheel_spd;
-      shot.shoot_cmd      = pc_rece_mesg.shoot_control_data.shoot_cmd;
+      gun_17.fric_wheel_spd = pc_rece_mesg.shoot_control_data.fric_wheel_spd;
+      //shot.shoot_cmd      = pc_rece_mesg.shoot_control_data.shoot_cmd;	//mrbin 20180205
       //shot.c_shoot_cmd    = pc_rece_mesg.shoot_control_data.c_shoot_cmd; // hf20180428
     }break;
     
     default:
     {
       shot.fric_wheel_run = 0;
-      shot.shoot_cmd      = 0;
+      //shot.shoot_cmd      = 0;	//mrbin 20180205
       //shot.c_shoot_cmd    = 0; // hf 20180428
     }break;
   }
@@ -237,8 +237,8 @@ void get_infantry_info(void)
   pc_send_mesg.gimbal_information.yaw_palstance      = gim.sensor.yaw_palstance; //dps
   
   /* shoot */
-  pc_send_mesg.shoot_task_information.remain_bullets  = shot.remain_bullets;
-  pc_send_mesg.shoot_task_information.shot_bullets    = shot.shot_bullets;
+  pc_send_mesg.shoot_task_information.remain_bullets  = gun_17.remain_bullets;
+  pc_send_mesg.shoot_task_information.shot_bullets    = gun_17.shot_bullets;
   pc_send_mesg.shoot_task_information.fric_wheel_run  = shot.fric_wheel_run;
 
   /* infantry error */

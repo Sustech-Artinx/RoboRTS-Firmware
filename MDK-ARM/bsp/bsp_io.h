@@ -32,8 +32,12 @@
 
 void turn_on_laser(void);
 void turn_off_laser(void);
-void turn_on_friction_wheel(uint16_t spd);
-void turn_off_friction_wheel(void);
+void turn_on_friction_wheel_g17(uint16_t spd);
+void turn_on_friction_wheel_g42(uint16_t spd);
+void turn_off_friction_wheel_g17(void);
+void turn_off_friction_wheel_g42(void);
+void g42_bupply_pusher_forward(void);
+void g42_bupply_pusher_back(void);
 
 void pwm_device_init(void);
 void mpu_heat_ctrl(uint16_t pwm_pulse);
