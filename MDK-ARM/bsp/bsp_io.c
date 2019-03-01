@@ -40,31 +40,13 @@ void turn_off_laser(void)
 
 uint8_t get_bbkey_state(void)
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
-  return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
-=======
-  static uint32_t last_change_time = 0;
-  static uint8_t last_state = 0;
-  uint8_t state = HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
-  if(state == last_state){
-    last_change_time = HAL_GetTick();
-  } else {
-    if(HAL_GetTick()-last_change_time >= 3){
-      //change keep 3ms
-      //the purpose is to remove the jitter of key
-      last_state = state;
-    }
-  }
-  return last_state; //changed by Mr.bin 20180421
->>>>>>> dev-bin
-=======
   //changed by Mr.bin 20180430
   return HAL_GPIO_ReadPin(TRIG_GPIO_Port, TRIG_Pin);
->>>>>>> origin/dev-bin
 }
 
+uint8_t get_key_state(void){
+  return HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);
+}
 
 void turn_on_friction_wheel(uint16_t spd)
 {

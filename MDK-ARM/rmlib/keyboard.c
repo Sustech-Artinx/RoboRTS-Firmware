@@ -113,11 +113,13 @@ static void move_direction_ctrl(uint8_t forward, uint8_t back,
   //add ramp
   if (forward)
   {
-    km.vx = km.x_spd_limit * ramp_calc(&fb_ramp);
+    //km.vx = km.x_spd_limit * ramp_calc(&fb_ramp);
+    km.vx = km.x_spd_limit;
   }
   else if (back)
   {
-    km.vx = -km.x_spd_limit * ramp_calc(&fb_ramp);
+    //km.vx = -km.x_spd_limit * ramp_calc(&fb_ramp);
+    km.vx = -km.x_spd_limit;
   }
   else
   {
@@ -127,11 +129,13 @@ static void move_direction_ctrl(uint8_t forward, uint8_t back,
 
   if (left)
   {
-    km.vy = km.y_spd_limit * ramp_calc(&lr_ramp);
+    //km.vy = km.y_spd_limit * ramp_calc(&lr_ramp);
+    km.vy = km.y_spd_limit;
   }
   else if (right)
   {
-    km.vy = -km.y_spd_limit * ramp_calc(&lr_ramp);
+    //km.vy = -km.y_spd_limit * ramp_calc(&lr_ramp);
+    km.vy = -km.y_spd_limit;
   }
   else
   {
@@ -170,20 +174,14 @@ static void kb_shoot_cmd(uint8_t shoot, uint8_t shoot_switch)
 		}
 		switch_shoot_mode(mode);
 	}
-	if (mode == 3){
-		shot.shoot_cmd = rc.mouse.l; //only fire when press donw the left key
-	}else{
-		if(shoot == 1){
-			shot.shoot_cmd = shoot;
-		}
-	}
+  //shot.shoot_cmd = rc.mouse.l; //ctrl code is moved to shoot_task
 }
 static void gimbal_operation_func(int16_t pit_ref_spd, int16_t yaw_ref_spd,
                                   uint8_t shoot_buff,  uint8_t track_armor)
 {
-  km.pit_v = -pit_ref_spd * 0.01f; //0.01f; changed by H.F. 20180405
-  km.yaw_v = -yaw_ref_spd * 0.05f; //0.01f;
-	km.vw = yaw_ref_spd; //0.01f; add by H.F.
+  km.pit_v = -pit_ref_spd * 0.1f; //0.01f; changed by H.F. 20180405
+  km.yaw_v = -yaw_ref_spd * 0.5f; //0.01f;
+	km.vw = yaw_ref_spd * 5; //0.01f; add by H.F.
  
   
   
@@ -238,6 +236,7 @@ void keyboard_gimbal_hook(void)
 {
   if (km.kb_enable)
   {
+    //gimbal_operation_func(rc.mouse.y, rc.mouse.x, BUFF_CTRL, TRACK_CTRL);
     gimbal_operation_func(rc.mouse.y, rc.mouse.x, BUFF_CTRL, TRACK_CTRL);
     
     exit_buff_hook(FORWARD, BACK, LEFT, RIGHT);

@@ -17,12 +17,11 @@
 
 #ifndef __SYS_H__
 #define __SYS_H__
-
+//#define hero
 #include "stm32f4xx_hal.h"
-
 /**********************remote control setting***************************/
 /* normalized remote controller proportion */
-#define RC_RESOLUTION     500.0f //660.0f
+#define RC_RESOLUTION     660.0f
 
 /*************************chassis setting*******************************/
 /* remote mode chassis move speed limit */
@@ -40,12 +39,12 @@
 /* keyboard mode speed limit */
 /* left and right speed (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_X  3300.0f 
-#define CHASSIS_KB_MOVE_RATIO_X 1.0f
-#define CHASSIS_KB_MOVE_RATIO_R 2.0f
+#define CHASSIS_KB_MOVE_RATIO_X 1.5f
+#define CHASSIS_KB_MOVE_RATIO_R 1.5f
 
 /* back and forward speed (mm/s) */
 #define CHASSIS_KB_MAX_SPEED_Y  3300.0f
-#define CHASSIS_KB_MOVE_RATIO_Y 1.0f
+#define CHASSIS_KB_MOVE_RATIO_Y 1.5f
 
 /**************************gimbal setting*******************************/
 /* remote mode gimbal speed limit */
@@ -53,7 +52,6 @@
 #define GIMBAL_RC_MOVE_RATIO_PIT 1.0f
 /* yaw axis speed */
 #define GIMBAL_RC_MOVE_RATIO_YAW 1.0f
-
 /* keyboard mode gimbal speed limit */
 /* pitch axis speed */
 #define GIMBAL_PC_MOVE_RATIO_PIT 1.0f
@@ -64,12 +62,7 @@
 /* shot speed */
 #define DEFAULT_FRIC_WHEEL_SPEED 1500 //maximum value is 2500
 /* shot frequence */
-<<<<<<< HEAD
-#define TRIGGER_MOTOR_SPEED      1600  //2000 
-#define TRIGGER_MOTOR_SPEED_SINGLE      2500 
-=======
-#define TRIGGER_MOTOR_SPEED      8000 
->>>>>>> dev-bin
+#define TRIGGER_MOTOR_SPEED      7000 
 
 
 
@@ -80,12 +73,12 @@
 #define PERIMETER  478
 
 /* wheel track distance(mm) */
-#define WHEELTRACK  448 //03 
+#define WHEELTRACK 403
 /* wheelbase distance(mm) */
-#define WHEELBASE  388 //385
- 
+#define WHEELBASE  385
+
 /* gimbal is relative to chassis center x axis offset(mm) */
-#define GIMBAL_X_OFFSET 111 
+#define GIMBAL_X_OFFSET 150
 /* gimbal is relative to chassis center y axis offset(mm) */
 #define GIMBAL_Y_OFFSET 0
 
@@ -109,7 +102,7 @@
   /* the deceleration ratio of chassis motor */
   #define CHASSIS_DECELE_RATIO (1.0f/19.0f)
   /* single 3508 motor maximum speed, unit is rpm */
-  #define MAX_WHEEL_RPM        8500  //  = 3500mm/s
+  #define MAX_WHEEL_RPM        8500  //8347rpm = 3500mm/s
   /* chassis maximum translation speed, unit is mm/s */
   #define MAX_CHASSIS_VX_SPEED 3300  //8000rpm
   #define MAX_CHASSIS_VY_SPEED 3300
@@ -127,7 +120,11 @@
 /* the positive direction of pitch axis motor */
 #define PIT_MOTO_POSITIVE_DIR  1.0f
 /* the positive direction of yaw axis motor */
-#define YAW_MOTO_POSITIVE_DIR  1.0f
+#ifdef hero
+	#define YAW_MOTO_POSITIVE_DIR  -1.0f
+#else
+	#define YAW_MOTO_POSITIVE_DIR  1.0f
+#endif
 /* the positive direction of tirgger motor */
 #define TRI_MOTO_POSITIVE_DIR  -1.0f
 
@@ -166,8 +163,8 @@
 
 
 /* gimbal relevant */
-#define PIT_ANGLE_MAX        18
-#define PIT_ANGLE_MIN        -16
+#define PIT_ANGLE_MAX        50
+#define PIT_ANGLE_MIN        -15
 #define YAW_ANGLE_MAX        50
 #define YAW_ANGLE_MIN        -50
 

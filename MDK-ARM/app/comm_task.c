@@ -277,17 +277,24 @@ static void send_client_show_data(void){
   client_show_data_t client_show_data;
   extern TaskHandle_t judge_unpack_task_t;
   extern shoot_t shot;
+  extern bullet_supply_t bupply;
   
   //set data
   //memset(&client_show_data, 0, sizeof(client_show_data_t));
   client_show_data.data1 = (float)shot.shoot_mode;
-  client_show_data.data2 = (float) shot.shot_bullets;
+  client_show_data.data2 = (float)shot.shot_bullets*2;
   client_show_data.data3 = 1.23;
-  client_show_data.mask = 0x00;
-  client_show_data.mask |= BIT0;
-  client_show_data.mask |= BIT2;
-  client_show_data.mask |= BIT4;
-  client_show_data.mask |= BIT7;
+  client_show_data.mask = 0xFF;
+  if(bupply.bbkey_state == BBKEY_OFF){
+    client_show_data.mask &= ~BIT0;
+  }
+  if(shot.shoot_state == STUCK_HANDLING){
+    client_show_data.mask &= ~BIT1;
+  }
+  //client_show_data.mask |= BIT0;
+  //client_show_data.mask |= BIT2;
+  //client_show_data.mask |= BIT4;
+  //client_show_data.mask |= BIT7;
   
   //send
   data_packet_pack(STU_CUSTOM_DATA_ID, (uint8_t *)&client_show_data,

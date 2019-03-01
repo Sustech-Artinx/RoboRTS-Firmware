@@ -82,7 +82,8 @@ void mode_switch_task(void const *argu)
 
 static void kb_enable_hook(void)
 {
-  if (rc.sw1 == RC_MI && rc.sw2 == RC_UP)
+  //if (rc.sw1 == RC_MI && rc.sw2 == RC_UP)
+  if (rc.sw2 != RC_DN)
     km.kb_enable = 1;
   else
     km.kb_enable = 0;
@@ -176,7 +177,7 @@ static void gimbal_mode_handle(void)
     case MANUAL_CTRL_MODE:
     {
       if (last_glb_ctrl_mode == SEMI_AUTO_MODE)
-        gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO;
+        gim.ctrl_mode = GIMBAL_FOLLOW_ZGYRO; // close loop
       
       /* no input control signal gimbal mode handle */
       if (gim.input.ac_mode == NO_ACTION)
@@ -271,8 +272,7 @@ static void gimbal_mode_handle(void)
         
         default:
         {
-          gim.ctrl_mode = GIMBAL_RELAX;			
-
+          gim.ctrl_mode = GIMBAL_RELAX;
         }break;
       }
     }break;
@@ -286,10 +286,7 @@ static void gimbal_mode_handle(void)
 		
 		default:
     {
-
-     gim.ctrl_mode = GIMBAL_RELAX;
-		//gim.ctrl_mode = GIMBAL_POSITION_MODE; // changed for hold gimbal by H.F. 20180420
-
+      gim.ctrl_mode = GIMBAL_RELAX;
     }break;
   }
 }
@@ -349,7 +346,7 @@ static void chassis_mode_handle(void)
       {
         case RC_UP:
         {
-          chassis.ctrl_mode = DODGE_MODE;
+          chassis.ctrl_mode = MANUAL_SEPARATE_GIMBAL;
         }break;
         
         case RC_MI:
@@ -406,7 +403,7 @@ void get_chassis_mode(void)
   
   if (gim.ctrl_mode == GIMBAL_INIT)
   {
-    chassis.ctrl_mode = CHASSIS_STOP;
+    //chassis.ctrl_mode = CHASSIS_STOP;
   }
   else
   {
